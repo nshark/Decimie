@@ -29,6 +29,7 @@ public class Card {
         this.manaCost = manaCost;
     }
     public String printCost(){
+        // return a string to properly print its price.
         return("Cost(mana, blood, bones): " + this.getManaCost() + ", " + this.getBloodCost() + ", " + this.getBoneCost());
     }
 }
