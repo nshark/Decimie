@@ -168,6 +168,21 @@ public class Main {
                             if (((Creature) matchup).getGlyph().equals("altar")) {
                                 AIblood = AIblood + 1;
                             }
+                            if (((Creature) card).getGlyph().equals("blood-drinker")) {
+                                blood = blood + 1;
+                            }
+                            if (((Creature) card).getGlyph().equals("blood-drinker")) {
+                                blood = blood + 1;
+                            }
+                            if (((Creature) card).getGlyph().equals("bone")) {
+                                bone = bone + 1;
+                            }
+                            if (((Creature) matchup).getGlyph().equals("bone")) {
+                                AIbone = AIbone + 1;
+                            }
+                            if (((Creature) card).getGlyph().equals("burn")) {
+                                AIlife = AIlife - 1;
+                            }
                             stateAI.remove(i);
                             AIbone = AIbone + 1;
                         }
@@ -209,11 +224,23 @@ public class Main {
             for (int i = 0; i < stateAI.size(); i++) {
                 Card card = cardBase.get(stateAI.get(i));
                 if (i < stateYour.size() && card.getClass() == Creature.class) {
-                    Card match = cardBase.get(stateAI.get(i));
+                    Card match = cardBase.get(stateYour.get(i));
                     if (match.getClass() == Creature.class) {
                         if (((Creature) match).getDef() <= ((Creature) card).getAtk()) {
                             if (((Creature) match).getGlyph().equals("altar")) {
                                 blood = blood + 1;
+                            }
+                            if (((Creature) card).getGlyph().equals("blood-drinker")) {
+                                AIblood = AIblood + 1;
+                            }
+                            if (((Creature) card).getGlyph().equals("bone")) {
+                                AIbone = AIbone + 1;
+                            }
+                            if (((Creature) match).getGlyph().equals("bone")) {
+                                bone = bone + 1;
+                            }
+                            if (((Creature) card).getGlyph().equals("burn")) {
+                                life = life - 1;
                             }
                             stateYour.remove(i);
                             AIbone = AIbone + 1;
