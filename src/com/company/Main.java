@@ -1,11 +1,8 @@
 package com.company;
 
-import java.lang.reflect.Array;
-import java.sql.SQLOutput;
 import java.util.*;
 
-import static java.util.Map.entry;
-
+@SuppressWarnings("ALL")
 public class Main {
     public static Scanner in = new Scanner(System.in);
     // various stats
@@ -23,7 +20,7 @@ public class Main {
     public static Deck pl2 = new Deck();
 
     public static Creature declareCreature(int mana, int blood, int bone, int atk, int health, String Glyph) {
-        // creates a new creature, and sets up its atributes.
+        // creates a new creature, and sets up its attributes.
         Creature card = new Creature();
         card.setAtk(atk);
         card.setDef(health);
@@ -49,7 +46,7 @@ public class Main {
     public static void DeclareCardBase(Map<String, Card> cardBase) {
         // Creates the card base, using the declareCreature and declareSpell methods. To add a card,
         // copy a line and change the stats. The key is the cards name.
-        cardBase.put("ZapWiz", declareCreature(2, 0, 0, 5, 2, "drawZap"));
+        cardBase.put("ZapWiz", declareCreature(2, 0, 0, 5, 2, "spell-caster"));
         cardBase.put("FireWiz", declareCreature(3, 0, 0, 4, 5, "burn"));
         cardBase.put("Skeletal Defender", declareCreature(0, 0, 10, 0, 10, null));
         cardBase.put("Demonic Entity", declareCreature(0, 3, 0, 7, 7, "burn"));
@@ -62,12 +59,12 @@ public class Main {
         cardBase.put("Zap", declareSpell(2, 0, 0, "Attack", 4, "instant"));
         cardBase.put("Thunder", declareSpell(4, 0, 0, "Attack", 8, "instant"));
         cardBase.put("ThunderStorm", declareSpell(5, 1, 0, "Attack", 2, "enchantment"));
-        cardBase.put("Disenchant", declareSpell(2, 0, 0, "DestroyEn", 1, "instant"));
+        cardBase.put("Disenchant", declareSpell(4, 0, 0, "DestroyEn", 1, "instant"));
         cardBase.put("Sniper", declareCreature(5, 0, 0, 25, 0, null));
     }
 
     public static boolean canCast(Card card, Boolean AI) {
-        // checks if you, or the ai, can cast a given card.
+        // checks if you, or the AI, can cast a given card.
         boolean m = Boolean.FALSE;
         if (AI) {
             if (card.getBoneCost() <= AIbone && card.getBloodCost() <= AIblood && card.getManaCost() <= AImana) {
@@ -84,15 +81,15 @@ public class Main {
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         // get the setup function going, and then start gameplay loop
-        Map<String, Card> cardBase = new HashMap<String, Card>();
+        Map<String, Card> cardBase = new HashMap<>();
         DeclareCardBase(cardBase);
         Deck pl1 = new Deck();
         while (true) {
-            pl1 = turn(cardBase, pl1);
+            turn(cardBase, pl1);
         }
     }
 
-    public static Deck turn(Map<String, Card> cardBase, Deck pl1) {
+    public static void turn(Map<String, Card> cardBase, Deck pl1) {
         if (manaMax == 0) {
             //set up your deck
             pl1.createDeck(cardBase, in);
@@ -104,7 +101,7 @@ public class Main {
             t.add(pl1.draw());
             life = 20;
             pl1.setHand(t);
-            //setup the AI
+            //set up the AI
             pl2.setAIDECK(cardBase);
             //draw its hand
             t = new ArrayList<String>();
@@ -115,7 +112,6 @@ public class Main {
             pl2.setHand(t);
             stateAI = new ArrayList<>();
             stateYour = new ArrayList<>();
-            return (pl1);
         } else {
             pl1.getHand().add(pl1.draw());
             //reset mana
@@ -128,25 +124,9 @@ public class Main {
             //print AI's board state
             boolean nextTurn = Boolean.FALSE;
             while (!nextTurn) {
-                for (int i = 0; i < stateYour.size(); i++) {
-                    Card card = cardBase.get(stateYour.get(i));
-                    if (card.getClass().equals(Creature.class)) {
-                        System.out.println(("Your Creature: " + stateYour.get(i) + " Atk: " + ((Creature) card).getAtk()) + " Def: " + ((Creature) card).getDef());
-                    }
-                    if (card.getClass().equals(Spell.class)) {
-                        System.out.println(("Your Spell " + stateYour.get(i) + " Power: " + ((Spell) card).getPower()) + " Action: " + ((Spell) card).getAction());
-                    }
-                }
-                //print AI's board state
-                for (String s : stateAI) {
-                    Card card = cardBase.get(s);
-                    if (card.getClass().equals(Creature.class)) {
-                        System.out.println(("Enemy Creature: " + s + " Atk: " + ((Creature) card).getAtk()) + " Def: " + ((Creature) card).getDef());
-                    }
-                    if (card.getClass().equals(Spell.class)) {
-                        System.out.println(("Enemy Spell " + s + " Power: " + ((Spell) card).getPower()) + " Action: " + ((Spell) card).getAction());
-                    }
-                }
+                System.out.println("Enemy Life:" + AIlife + " Your life" + life + "(mana, blood, bone)" + mana + "," + blood + "," + bone);
+                System.out.println(stateYour);
+                System.out.println(stateAI);
                 for (int i = 0; i < pl1.hand.size(); i++) {
                     Card card = cardBase.get(pl1.hand.get(i));
                     System.out.println(i + "." + pl1.hand.get(i) + ": " + card.printCost());
@@ -158,10 +138,9 @@ public class Main {
                     }
                 }
                 String play = in.nextLine();
-                if(play.equals("pass") || play.equals("Pass") || play.equals("next") || play.equals("next turn") || play.equals("t")){
+                if (play.equals("pass") || play.equals("Pass") || play.equals("next") || play.equals("next turn") || play.equals("t")) {
                     nextTurn = true;
-                }
-                else if (Integer.parseInt(play) < pl1.hand.size()) {
+                } else if (Integer.parseInt(play) < pl1.hand.size()) {
                     Card card = cardBase.get(pl1.hand.get(Integer.parseInt(play)));
                     if (canCast(card, Boolean.FALSE)) {
                         blood = blood - card.getBloodCost();
@@ -182,29 +161,77 @@ public class Main {
             }
             for (int i = 0; i < stateYour.size(); i++) {
                 Card card = cardBase.get(stateYour.get(i));
-                if (i < stateAI.size() && card.getClass() == Creature.class){
+                if (i < stateAI.size() && card.getClass() == Creature.class) {
                     Card matchup = cardBase.get(stateAI.get(i));
-                    if (matchup.getClass() == Creature.class){
-                        if(((Creature) matchup).getDef() <= ((Creature) card).getAtk()){
-                            if (((Creature) matchup).getGlyph().equals("Altar")){
-                                AIblood = AIblood+1;
+                    if (matchup.getClass() == Creature.class) {
+                        if (((Creature) matchup).getDef() <= ((Creature) card).getAtk()) {
+                            if (((Creature) matchup).getGlyph().equals("altar")) {
+                                AIblood = AIblood + 1;
                             }
                             stateAI.remove(i);
                             AIbone = AIbone + 1;
                         }
-                    }
-                    else{
+                    } else if (((Creature) card).getGlyph().equals("healer")) {
+                        life = life + ((Creature) card).getAtk();
+                    } else {
                         AIlife = AIlife - ((Creature) card).getAtk();
                     }
-                }
-                else if (card.getClass() == Creature.class){
+                } else if (card.getClass() == Creature.class) {
                     AIlife = AIlife - ((Creature) card).getAtk();
-                }
-                else if (card.getClass() == Spell.class){
+                } else if (card.getClass() == Spell.class) {
                     ((Spell) card).cast(stateYour, stateAI, cardBase);
                 }
             }
-            return (pl1);
+            nextTurn = Boolean.FALSE;
+            while (!nextTurn) {
+                String play = pl2.moveAI();
+                if (play.equals("pass") || play.equals("Pass") || play.equals("next") || play.equals("next turn") || play.equals("t")) {
+                    nextTurn = true;
+                } else if (Integer.parseInt(play) < pl2.hand.size()) {
+                    Card card = cardBase.get(pl2.hand.get(Integer.parseInt(play)));
+                    if (canCast(card, Boolean.TRUE)) {
+                        AIblood = AIblood - card.getBloodCost();
+                        AIbone = AIbone - card.getBoneCost();
+                        AImana = AImana - card.getManaCost();
+                        if (card.getClass() == Creature.class) {
+                            stateAI.add(pl2.hand.get(Integer.parseInt(play)));
+                        } else if (card.getClass() == Spell.class) {
+                            if (((Spell) card).getType().equals("enchantment"))
+                                stateAI.add(pl2.hand.get(Integer.parseInt(play)));
+                            else {
+                                ((Spell) card).cast(stateAI, stateYour, cardBase);
+                            }
+                        }
+                        pl2.getHand().remove(Integer.parseInt(play));
+                    }
+                }
+            }
+            for (int i = 0; i < stateAI.size(); i++) {
+                Card card = cardBase.get(stateAI.get(i));
+                if (i < stateYour.size() && card.getClass() == Creature.class) {
+                    Card match = cardBase.get(stateAI.get(i));
+                    if (match.getClass() == Creature.class) {
+                        if (((Creature) match).getDef() <= ((Creature) card).getAtk()) {
+                            if (((Creature) match).getGlyph().equals("altar")) {
+                                blood = blood + 1;
+                            }
+                            stateYour.remove(i);
+                            AIbone = AIbone + 1;
+                        }
+                    } else if (((Creature) card).getGlyph().equals("healer")) {
+                        AIlife = AIlife + ((Creature) card).getAtk();
+                    } else {
+                        AIlife = AIlife - ((Creature) card).getAtk();
+                    }
+                } else if (card.getClass() == Creature.class) {
+                    if (((Creature) card).getGlyph().equals("healer")) {
+                        AIlife = AIlife + ((Creature) card).getAtk();
+                    }
+                    life = life - ((Creature) card).getAtk();
+                } else if (card.getClass() == Spell.class) {
+                    ((Spell) card).cast(stateAI, stateYour, cardBase);
+                }
+            }
         }
     }
 }

@@ -87,14 +87,17 @@ public class Deck {
             int index = ran.nextInt(cardBase.size());
             if(this.cards.containsKey(cardBase.keySet().toArray()[index])){
                 // if a card already exists in the deck, increase the amount of that card by one
-                this.cardNum.replace((String) cardBase.keySet().toArray()[index], this.cardNum.get((String) cardBase.keySet().toArray()[index])+1);
-            }
-            else {
+                this.cardNum.replace((String) cardBase.keySet().toArray()[index], this.cardNum.get((String) cardBase.keySet().toArray()[index]) + 1);
+            } else {
                 // else, add it to the deck
                 this.cardNum.put((String) cardBase.keySet().toArray()[index], 1);
                 this.cards.put((String) cardBase.keySet().toArray()[index], (Card) cardBase.get(cardBase.keySet().toArray()[index]));
             }
         }
         reshuffle();
+    }
+
+    public String moveAI() {
+        return ("pass");
     }
 }
