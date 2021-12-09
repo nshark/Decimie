@@ -21,6 +21,7 @@ public class Main {
     public static ArrayList<String> stateYour = new ArrayList<>(); // permanents you control. A list of keys to cardBase
     public static ArrayList<String> stateAI = new ArrayList<>(); // permanents the AI controls,
     public static Deck pl2 = new Deck();
+
     public static Creature declareCreature(int mana, int blood, int bone, int atk, int health, String Glyph) {
         // creates a new creature, and sets up its atributes.
         Creature card = new Creature();
@@ -30,8 +31,9 @@ public class Main {
         card.setBloodCost(blood);
         card.setBoneCost(bone);
         card.setGlyph(Glyph);
-        return(card);
+        return (card);
     }
+
     public static Spell declareSpell(int mana, int blood, int bone, String action, int power, String type) {
         // creates a new spell, and sets each of its attributes
         Spell card = new Spell();
@@ -41,9 +43,10 @@ public class Main {
         card.setBloodCost(blood);
         card.setBoneCost(bone);
         card.setType(type);
-        return(card);
+        return (card);
     }
-    public static void DeclareCardBase(Map<String, Card> cardBase){
+
+    public static void DeclareCardBase(Map<String, Card> cardBase) {
         // Creates the card base, using the declareCreature and declareSpell methods. To add a card,
         // copy a line and change the stats. The key is the cards name.
         cardBase.put("ZapWiz", declareCreature(2, 0, 0, 5, 2, "drawZap"));
@@ -58,38 +61,39 @@ public class Main {
         cardBase.put("Vampire", declareCreature(0, 1, 2, 3, 5, "blood-drinker"));
         cardBase.put("Zap", declareSpell(2, 0, 0, "Attack", 4, "instant"));
         cardBase.put("Thunder", declareSpell(4, 0, 0, "Attack", 8, "instant"));
-        cardBase.put("Heal", declareSpell(2, 0, 0, "Heal", 4, "instant"));
-        cardBase.put("Surge", declareSpell(3, 0, 0, "BuffAtk", 2, "sorcery"));
-        cardBase.put("ThunderStorm", declareSpell(5, 1, 0, "AttackAll", 2, "enchantment"));
+        cardBase.put("ThunderStorm", declareSpell(5, 1, 0, "Attack", 2, "enchantment"));
         cardBase.put("Disenchant", declareSpell(2, 0, 0, "DestroyEn", 1, "instant"));
-        }
-    public static boolean canCast(Card card, Boolean AI){
+        cardBase.put("Sniper", declareCreature(5, 0, 0, 25, 0, null));
+    }
+
+    public static boolean canCast(Card card, Boolean AI) {
         // checks if you, or the ai, can cast a given card.
         boolean m = Boolean.FALSE;
-        if(AI){
-            if(card.getBoneCost()<=AIbone && card.getBloodCost()<=AIblood && card.getManaCost()<=AImana){
+        if (AI) {
+            if (card.getBoneCost() <= AIbone && card.getBloodCost() <= AIblood && card.getManaCost() <= AImana) {
+                m = Boolean.TRUE;
+            }
+        } else {
+            if (card.getBoneCost() <= bone && card.getBloodCost() <= blood && card.getManaCost() <= mana) {
                 m = Boolean.TRUE;
             }
         }
-        else{
-            if(card.getBoneCost()<=bone && card.getBloodCost()<=blood && card.getManaCost()<=mana){
-                m = Boolean.TRUE;
-            }
-        }
-        return(m);
+        return (m);
     }
+
     @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         // get the setup function going, and then start gameplay loop
-        Map<String, Card> cardBase =  new HashMap<String, Card>();
+        Map<String, Card> cardBase = new HashMap<String, Card>();
         DeclareCardBase(cardBase);
         Deck pl1 = new Deck();
-        while(true){
+        while (true) {
             pl1 = turn(cardBase, pl1);
         }
     }
+
     public static Deck turn(Map<String, Card> cardBase, Deck pl1) {
-        if(manaMax == 0){
+        if (manaMax == 0) {
             //set up your deck
             pl1.createDeck(cardBase, in);
             manaMax += 1;
@@ -111,9 +115,8 @@ public class Main {
             pl2.setHand(t);
             stateAI = new ArrayList<>();
             stateYour = new ArrayList<>();
-            return(pl1);
-        }
-        else {
+            return (pl1);
+        } else {
             pl1.getHand().add(pl1.draw());
             //reset mana
             if (manaMax != 10) {
@@ -122,58 +125,86 @@ public class Main {
             mana = manaMax;
             AImana = manaMax;
             //print stats
-            System.out.println("(bone:" + bone + ", mana:" + mana + ", blood:" + blood + ", life:" + life);
-            System.out.println("Enemy Life is:" + AIlife);
-            //print your board state
+            //print AI's board state
+            boolean nextTurn = Boolean.FALSE;
+            while (!nextTurn) {
+                for (int i = 0; i < stateYour.size(); i++) {
+                    Card card = cardBase.get(stateYour.get(i));
+                    if (card.getClass().equals(Creature.class)) {
+                        System.out.println(("Your Creature: " + stateYour.get(i) + " Atk: " + ((Creature) card).getAtk()) + " Def: " + ((Creature) card).getDef());
+                    }
+                    if (card.getClass().equals(Spell.class)) {
+                        System.out.println(("Your Spell " + stateYour.get(i) + " Power: " + ((Spell) card).getPower()) + " Action: " + ((Spell) card).getAction());
+                    }
+                }
+                //print AI's board state
+                for (String s : stateAI) {
+                    Card card = cardBase.get(s);
+                    if (card.getClass().equals(Creature.class)) {
+                        System.out.println(("Enemy Creature: " + s + " Atk: " + ((Creature) card).getAtk()) + " Def: " + ((Creature) card).getDef());
+                    }
+                    if (card.getClass().equals(Spell.class)) {
+                        System.out.println(("Enemy Spell " + s + " Power: " + ((Spell) card).getPower()) + " Action: " + ((Spell) card).getAction());
+                    }
+                }
+                for (int i = 0; i < pl1.hand.size(); i++) {
+                    Card card = cardBase.get(pl1.hand.get(i));
+                    System.out.println(i + "." + pl1.hand.get(i) + ": " + card.printCost());
+                    if (card.getClass() == Creature.class) {
+                        System.out.println(((Creature) card).print());
+                    }
+                    if (card.getClass() == Spell.class) {
+                        System.out.println(((Spell) card).print());
+                    }
+                }
+                String play = in.nextLine();
+                if(play.equals("pass") || play.equals("Pass") || play.equals("next") || play.equals("next turn") || play.equals("t")){
+                    nextTurn = true;
+                }
+                else if (Integer.parseInt(play) < pl1.hand.size()) {
+                    Card card = cardBase.get(pl1.hand.get(Integer.parseInt(play)));
+                    if (canCast(card, Boolean.FALSE)) {
+                        blood = blood - card.getBloodCost();
+                        bone = bone - card.getBoneCost();
+                        mana = mana - card.getManaCost();
+                        if (card.getClass() == Creature.class) {
+                            stateYour.add(pl1.hand.get(Integer.parseInt(play)));
+                        } else if (card.getClass() == Spell.class) {
+                            if (((Spell) card).getType().equals("enchantment"))
+                                stateYour.add(pl1.hand.get(Integer.parseInt(play)));
+                            else {
+                                ((Spell) card).cast(stateYour, stateAI, cardBase);
+                            }
+                        }
+                        pl1.getHand().remove(Integer.parseInt(play));
+                    }
+                }
+            }
             for (int i = 0; i < stateYour.size(); i++) {
                 Card card = cardBase.get(stateYour.get(i));
-                if (card.getClass().equals(Creature.class)) {
-                    System.out.println(("Your Creature: " + stateYour.get(i) + " Atk: " + ((Creature) card).getAtk()) + " Def: " + ((Creature) card).getDef());
-                }
-                if (card.getClass().equals(Spell.class)) {
-                    System.out.println(("Your Spell " + stateYour.get(i) + " Power: " + ((Spell) card).getPower()) + " Action: " + ((Spell) card).getAction());
-                }
-            }
-            //print AI's board state
-            for (int i = 0; i < stateAI.size(); i++) {
-                Card card = cardBase.get(stateAI.get(i));
-                if (card.getClass().equals(Creature.class)) {
-                    System.out.println(("Enemy Creature: " + stateAI.get(i) + " Atk: " + ((Creature) card).getAtk()) + " Def: " + ((Creature) card).getDef());
-                }
-                if (card.getClass().equals(Spell.class)) {
-                    System.out.println(("Enemy Spell " + stateAI.get(i) + " Power: " + ((Spell) card).getPower()) + " Action: " + ((Spell) card).getAction());
-                }
-            }
-            for (int i = 0; i < pl1.hand.size(); i++) {
-                Card card = cardBase.get(pl1.hand.get(i));
-                System.out.println(i + "." + pl1.hand.get(i) + ": " + card.printCost());
-                if(card.getClass() == Creature.class){
-                    System.out.println(((Creature) card).print());
-                }
-                if(card.getClass() == Spell.class){
-                    System.out.println(((Spell) card).print());
-                }
-            }
-            String play = in.nextLine();
-            if(Integer.parseInt(play) < pl1.hand.size()){
-                Card card = cardBase.get(pl1.hand.get(Integer.parseInt(play)));
-                if(canCast(card, Boolean.FALSE)){
-                    blood = blood - card.getBloodCost();
-                    bone = bone - card.getBoneCost();
-                    mana = mana - card.getManaCost();
-                    if(card.getClass() == Creature.class){
-                        stateYour.add(pl1.hand.get(Integer.parseInt(play)));
-                    }
-                    else if(card.getClass() == Spell.class){
-                        if(((Spell) card).getType().equals("enchantment"))
-                        stateYour.add(pl1.hand.get(Integer.parseInt(play)));
-                        else{
-                            ((Spell) card).cast(stateYour, stateAI, cardBase);
+                if (i < stateAI.size() && card.getClass() == Creature.class){
+                    Card matchup = cardBase.get(stateAI.get(i));
+                    if (matchup.getClass() == Creature.class){
+                        if(((Creature) matchup).getDef() <= ((Creature) card).getAtk()){
+                            if (((Creature) matchup).getGlyph().equals("Altar")){
+                                AIblood = AIblood+1;
+                            }
+                            stateAI.remove(i);
+                            AIbone = AIbone + 1;
                         }
                     }
+                    else{
+                        AIlife = AIlife - ((Creature) card).getAtk();
+                    }
+                }
+                else if (card.getClass() == Creature.class){
+                    AIlife = AIlife - ((Creature) card).getAtk();
+                }
+                else if (card.getClass() == Spell.class){
+                    ((Spell) card).cast(stateYour, stateAI, cardBase);
                 }
             }
-            return(pl1);
+            return (pl1);
         }
     }
 }
