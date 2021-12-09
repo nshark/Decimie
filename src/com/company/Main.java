@@ -152,7 +152,7 @@ public class Main {
                             if (((Spell) card).getType().equals("enchantment"))
                                 stateYour.add(pl1.hand.get(Integer.parseInt(play)));
                             else {
-                                ((Spell) card).cast(stateYour, stateAI, cardBase);
+                                ((Spell) card).cast(stateYour, stateAI, cardBase,blood);
                             }
                         }
                         pl1.getHand().remove(Integer.parseInt(play));
@@ -179,7 +179,7 @@ public class Main {
                 } else if (card.getClass() == Creature.class) {
                     AIlife = AIlife - ((Creature) card).getAtk();
                 } else if (card.getClass() == Spell.class) {
-                    ((Spell) card).cast(stateYour, stateAI, cardBase);
+                    ((Spell) card).cast(stateYour, stateAI, cardBase,blood);
                 }
             }
             nextTurn = Boolean.FALSE;
@@ -199,7 +199,7 @@ public class Main {
                             if (((Spell) card).getType().equals("enchantment"))
                                 stateAI.add(pl2.hand.get(Integer.parseInt(play)));
                             else {
-                                ((Spell) card).cast(stateAI, stateYour, cardBase);
+                                ((Spell) card).cast(stateAI, stateYour, cardBase, AIblood);
                             }
                         }
                         pl2.getHand().remove(Integer.parseInt(play));
@@ -229,7 +229,7 @@ public class Main {
                     }
                     life = life - ((Creature) card).getAtk();
                 } else if (card.getClass() == Spell.class) {
-                    ((Spell) card).cast(stateAI, stateYour, cardBase);
+                    ((Spell) card).cast(stateAI, stateYour, cardBase, AIblood);
                 }
             }
         }
