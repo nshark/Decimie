@@ -10,7 +10,7 @@ public class Deck {
     public Random ran = new Random();
     public ArrayList<String> hand = new ArrayList<String>();
     public ArrayList<String> getHand() {
-        return hand;
+        return this.hand;
     }
     public void setHand(ArrayList<String> hand) {
         this.hand = hand;
@@ -18,7 +18,7 @@ public class Deck {
     public void createDeck(Map<String, Card> cardBase, Scanner in){
         /*Allows a player to manually create a deck*/
         // resets the cards in the deck
-        cards = new HashMap<String, Card>();
+        this.cards = new HashMap<String, Card>();
         Spell x = new Spell();
         Creature y = new Creature();
         // prints out the available cards, and the index to add them to the deck
@@ -43,49 +43,57 @@ public class Deck {
                 System.out.println("Please select valid card index");
             }
             else{
-                if(cards.containsKey(cardBase.keySet().toArray()[index])){
+                if(this.cards.containsKey(cardBase.keySet().toArray()[index])){
                     // if a card already exists in the deck, increase the amount of that card by one
-                    cardNum.replace((String) cardBase.keySet().toArray()[index], cardNum.get((String) cardBase.keySet().toArray()[index])+1);
+                    this.cardNum.replace((String) cardBase.keySet().toArray()[index], this.cardNum.get((String) cardBase.keySet().toArray()[index])+1);
                 }
                 else {
                     // else, add it to the deck
-                    cardNum.put((String) cardBase.keySet().toArray()[index], 1);
-                    cards.put((String) cardBase.keySet().toArray()[index], (Card) cardBase.get(cardBase.keySet().toArray()[index]));
+                    this.cardNum.put((String) cardBase.keySet().toArray()[index], 1);
+                    this.cards.put((String) cardBase.keySet().toArray()[index], (Card) cardBase.get(cardBase.keySet().toArray()[index]));
                 }
             }
         }
         System.out.println("Deck Complete");
-        for (int i = 0; i < cardNum.size(); i++) {
-            System.out.println((String) cardNum.keySet().toArray()[i] + " " + cardNum.get(cardNum.keySet().toArray()[i]));
+        for (int i = 0; i < this.cardNum.size(); i++) {
+            System.out.println((String) this.cardNum.keySet().toArray()[i] + " " + this.cardNum.get(cardNum.keySet().toArray()[i]));
         }
         reshuffle();
     }
     public void reshuffle() {
         /*Reshuffles already draw cards into the drawing pool.*/
-        unDrawn = new ArrayList<>();
-        for (int i = 0; i < cardNum.size(); i++) {
-            for (int j = 0; j < cardNum.get(cardNum.keySet().toArray()[i]); j++) {
-                unDrawn.add((String) cardNum.keySet().toArray()[i]);
+        this.unDrawn = new ArrayList<>();
+        for (int i = 0; i < this.cardNum.size(); i++) {
+            for (int j = 0; j < this.cardNum.get(this.cardNum.keySet().toArray()[i]); j++) {
+                this.unDrawn.add((String) this.cardNum.keySet().toArray()[i]);
             }
         }
     }
     public String draw(){
         /*Draw a card, and then remove a card. Returns the string key(in cardBase) of the drawn card.
         * If there is no cards left to draw, reshuffles the deck and draws*/
-        if (unDrawn.size() == 0){
-            reshuffle();
+        if (this.unDrawn.size() == 0){
+            this.reshuffle();
         }
-        int m = ran.nextInt(unDrawn.size());
-        String x = unDrawn.get(m);
-        unDrawn.remove(m);
+        int m = ran.nextInt(this.unDrawn.size());
+        String x = this.unDrawn.get(m);
+        this.unDrawn.remove(m);
         return(x);
     }
     public void setAIDECK(Map<String, Card> cardBase){
         /*Randomly creates a deck for the AI to play, and sets this deck to be a AI*/
-        AI = Boolean.TRUE;
+        this.AI = Boolean.TRUE;
         for (int i = 0; i < 10; i++) {
-            int index = ran.nextInt(cardBase.size()-1);
-            cards.put((String) cardBase.keySet().toArray()[index], (Card) cardBase.get(cardBase.keySet().toArray()[index]));
+            int index = ran.nextInt(cardBase.size());
+            if(this.cards.containsKey(cardBase.keySet().toArray()[index])){
+                // if a card already exists in the deck, increase the amount of that card by one
+                this.cardNum.replace((String) cardBase.keySet().toArray()[index], this.cardNum.get((String) cardBase.keySet().toArray()[index])+1);
+            }
+            else {
+                // else, add it to the deck
+                this.cardNum.put((String) cardBase.keySet().toArray()[index], 1);
+                this.cards.put((String) cardBase.keySet().toArray()[index], (Card) cardBase.get(cardBase.keySet().toArray()[index]));
+            }
         }
         reshuffle();
     }
