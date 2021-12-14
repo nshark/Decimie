@@ -37,13 +37,20 @@ public class Spell extends Card {
         return ("Action: " + this.getAction() + ", " + "Type: " + this.getType() + ", " + "Power: " + this.getPower());
     }
 
-    public void cast(ArrayList<String> stateYour, ArrayList<String> stateAI, Map<String, Card> cardBase, int b) {
+    public void cast(ArrayList<String> stateYour, ArrayList<String> stateAI, Map<String, Card> cardBase, int b, int bone) {
         if (this.action.equals("Attack")) {
             for (int i = 0; i < stateAI.size(); i++) {
                 Card card = cardBase.get(stateAI.get(i));
                 if (card.getClass() == Creature.class) {
                     if (((Creature) card).getDef() <= this.power) {
                         stateAI.remove(i);
+                        if (((Creature) card).getGlyph().equals("bone")) {
+                            bone = bone + 1;
+                        }
+                        if (((Creature) card).getGlyph().equals("altar")) {
+                            b = b + 1;
+                        }
+                        bone = bone + 1;
                         i = i - 1;
                     }
                 }
@@ -67,6 +74,13 @@ public class Spell extends Card {
                         stateYour.remove(i);
                         i = i - 1;
                         b = b + 1;
+                        bone = bone + 1;
+                        if (((Creature) card).getGlyph().equals("bone")) {
+                            bone = bone + 1;
+                        }
+                        if (((Creature) card).getGlyph().equals("altar")) {
+                            b = b + 1;
+                        }
                     }
                 }
             }

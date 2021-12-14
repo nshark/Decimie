@@ -7,11 +7,11 @@ public class Main {
     public static Scanner in = new Scanner(System.in);
     // various stats
     public static int bone = 0;
-    public static int life = 20;
+    public static int life = 40;
     public static int manaMax = 0;
     public static int mana = 1;
     public static int AIbone = 0;
-    public static int AIlife = 20;
+    public static int AIlife = 40;
     public static int AImana = 1;
     public static int blood = 0;
     public static int AIblood = 0;
@@ -46,13 +46,14 @@ public class Main {
     public static void DeclareCardBase(Map<String, Card> cardBase) {
         // Creates the card base, using the declareCreature and declareSpell methods. To add a card,
         // copy a line and change the stats. The key is the cards name.
-        cardBase.put("ZapWiz", declareCreature(2, 0, 0, 5, 2, "spell-caster"));
+        cardBase.put("Skeleton", declareCreature(0, 0, 2, 2, 2, "bone"));
+        cardBase.put("ZapWiz", declareCreature(3, 0, 0, 5, 2, "spell-caster"));
         cardBase.put("FireWiz", declareCreature(3, 0, 0, 4, 5, "burn"));
         cardBase.put("Skeletal Defender", declareCreature(0, 0, 10, 0, 10, null));
         cardBase.put("Demonic Entity", declareCreature(0, 3, 0, 7, 7, "burn"));
         cardBase.put("Sacrifice", declareCreature(0, 0, 0, 0, 1, "altar"));
         cardBase.put("Innocent", declareCreature(4, 0, 0, 2, 2, "divine"));
-        cardBase.put("Priest", declareCreature(5, 0, 0, 0, 5, "healer"));
+        cardBase.put("Priest", declareCreature(5, 0, 0, 2, 5, "healer"));
         cardBase.put("Knight", declareCreature(6, 0, 0, 5, 10, "guard"));
         cardBase.put("Dragon", declareCreature(0, 4, 5, 5, 10, "AOE"));
         cardBase.put("Vampire", declareCreature(0, 1, 2, 3, 5, "blood-drinker"));
@@ -61,6 +62,9 @@ public class Main {
         cardBase.put("ThunderStorm", declareSpell(5, 1, 0, "Attack", 2, "enchantment"));
         cardBase.put("Disenchant", declareSpell(4, 0, 0, "DestroyEn", 1, "instant"));
         cardBase.put("Sniper", declareCreature(5, 0, 0, 25, 0, null));
+        cardBase.put("ArchPriest", declareCreature(8, 0, 0, 5, 5, "healer"));
+        cardBase.put("DarkPriest", declareCreature(5, 3, 0, 10, 5, "healer"));
+
     }
 
     public static boolean canCast(Card card, Boolean AI) {
@@ -99,7 +103,7 @@ public class Main {
             t.add(pl1.draw());
             t.add(pl1.draw());
             t.add(pl1.draw());
-            life = 20;
+            life = 40;
             pl1.setHand(t);
             //set up the AI
             pl2.setAIDECK(cardBase);
@@ -108,12 +112,13 @@ public class Main {
             t.add(pl2.draw());
             t.add(pl2.draw());
             t.add(pl2.draw());
-            AIlife = 20;
+            AIlife = 40;
             pl2.setHand(t);
             stateAI = new ArrayList<>();
             stateYour = new ArrayList<>();
         } else {
             pl1.getHand().add(pl1.draw());
+            pl2.getHand().add(pl2.draw());
             //reset mana
             if (manaMax != 10) {
                 manaMax += 1;
@@ -124,7 +129,7 @@ public class Main {
             //print AI's board state
             boolean nextTurn = Boolean.FALSE;
             while (!nextTurn) {
-                System.out.println("Enemy Life:" + AIlife + " Your life" + life + "(mana, blood, bone)" + mana + "," + blood + "," + bone);
+                System.out.println("Enemy Life:" + AIlife + " Your life" + life + " (mana, blood, bone)" + mana + "," + blood + "," + bone);
                 System.out.println(stateYour);
                 System.out.println(stateAI);
                 for (int i = 0; i < pl1.hand.size(); i++) {
@@ -152,7 +157,7 @@ public class Main {
                             if (((Spell) card).getType().equals("enchantment"))
                                 stateYour.add(pl1.hand.get(Integer.parseInt(play)));
                             else {
-                                ((Spell) card).cast(stateYour, stateAI, cardBase,blood);
+                                ((Spell) card).cast(stateYour, stateAI, cardBase, blood, AIbone);
                             }
                         }
                         pl1.getHand().remove(Integer.parseInt(play));
@@ -161,8 +166,13 @@ public class Main {
             }
             for (int i = 0; i < stateYour.size(); i++) {
                 Card card = cardBase.get(stateYour.get(i));
-                if (i < stateAI.size() && card.getClass() == Creature.class) {
-                    Card matchup = cardBase.get(stateAI.get(i));
+                if ((i < stateYour.size() && card.getClass() == Creature.class) || stateAI.contains("Knight")) {
+                    Card matchup;
+                    if (stateAI.contains("Knight")) {
+                        matchup = cardBase.get("Knight");
+                    } else {
+                        matchup = cardBase.get(stateAI.get(i));
+                    }
                     if (matchup.getClass() == Creature.class) {
                         if (((Creature) matchup).getDef() <= ((Creature) card).getAtk()) {
                             if (((Creature) matchup).getGlyph().equals("altar")) {
@@ -183,7 +193,11 @@ public class Main {
                             if (((Creature) card).getGlyph().equals("burn")) {
                                 AIlife = AIlife - 1;
                             }
-                            stateAI.remove(i);
+                            if (stateAI.contains("Knight")) {
+                                stateAI.remove("Knight");
+                            } else {
+                                stateAI.remove(i);
+                            }
                             AIbone = AIbone + 1;
                         }
                     } else if (((Creature) card).getGlyph().equals("healer")) {
@@ -194,7 +208,7 @@ public class Main {
                 } else if (card.getClass() == Creature.class) {
                     AIlife = AIlife - ((Creature) card).getAtk();
                 } else if (card.getClass() == Spell.class) {
-                    ((Spell) card).cast(stateYour, stateAI, cardBase,blood);
+                    ((Spell) card).cast(stateYour, stateAI, cardBase, blood, AIbone);
                 }
             }
             nextTurn = Boolean.FALSE;
@@ -214,7 +228,7 @@ public class Main {
                             if (((Spell) card).getType().equals("enchantment"))
                                 stateAI.add(pl2.hand.get(Integer.parseInt(play)));
                             else {
-                                ((Spell) card).cast(stateAI, stateYour, cardBase, AIblood);
+                                ((Spell) card).cast(stateAI, stateYour, cardBase, AIblood, bone);
                             }
                         }
                         pl2.getHand().remove(Integer.parseInt(play));
@@ -223,8 +237,13 @@ public class Main {
             }
             for (int i = 0; i < stateAI.size(); i++) {
                 Card card = cardBase.get(stateAI.get(i));
-                if (i < stateYour.size() && card.getClass() == Creature.class) {
-                    Card match = cardBase.get(stateYour.get(i));
+                if ((i < stateYour.size() && card.getClass() == Creature.class) || stateYour.contains("Knight")) {
+                    Card match;
+                    if (stateYour.contains("Knight")) {
+                        match = cardBase.get("Knight");
+                    } else {
+                        match = cardBase.get(stateYour.get(i));
+                    }
                     if (match.getClass() == Creature.class) {
                         if (((Creature) match).getDef() <= ((Creature) card).getAtk()) {
                             if (((Creature) match).getGlyph().equals("altar")) {
@@ -242,8 +261,12 @@ public class Main {
                             if (((Creature) card).getGlyph().equals("burn")) {
                                 life = life - 1;
                             }
-                            stateYour.remove(i);
-                            AIbone = AIbone + 1;
+                            if (stateYour.contains("Knight")) {
+                                stateYour.remove("Knight");
+                            } else {
+                                stateYour.remove(i);
+                            }
+                            bone = bone + 1;
                         }
                     } else if (((Creature) card).getGlyph().equals("healer")) {
                         AIlife = AIlife + ((Creature) card).getAtk();
@@ -256,7 +279,7 @@ public class Main {
                     }
                     life = life - ((Creature) card).getAtk();
                 } else if (card.getClass() == Spell.class) {
-                    ((Spell) card).cast(stateAI, stateYour, cardBase, AIblood);
+                    ((Spell) card).cast(stateAI, stateYour, cardBase, AIblood, bone);
                 }
             }
         }
