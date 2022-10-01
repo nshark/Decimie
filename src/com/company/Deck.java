@@ -3,11 +3,11 @@ package com.company;
 import java.lang.reflect.Array;
 import java.util.*;
 public class Deck {
-    public Map<String, Card> cards = new HashMap<String, Card>();
-    public Map<String, Integer> cardNum = new HashMap<String, Integer>();
-    public ArrayList<String> unDrawn = new ArrayList<String>();
-    public boolean AI = Boolean.FALSE;
-    public Random ran = new Random();
+    private Map<String, Card> cards = new HashMap<String, Card>();
+    private Map<String, Integer> cardNum = new HashMap<String, Integer>();
+    private ArrayList<String> unDrawn = new ArrayList<String>();
+    private boolean AI = Boolean.FALSE;
+    private final Random ran = new Random();
     public ArrayList<String> hand = new ArrayList<String>();
     public int coun = 0;
 

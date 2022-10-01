@@ -6,16 +6,16 @@ import java.util.*;
 public class Main {
     public static Scanner in = new Scanner(System.in);
     // various stats
-    public static int bone = 0;
-    public static int life = 40;
-    public static int manaMax = 0;
-    public static int mana = 1;
-    public static int AIbone = 0;
+    private static int bone = 0;
+    private static int life = 40;
+    private static int manaMax = 0;
+    private static int mana = 1;
+    private static int AIbone = 0;
     public static int AIlife = 40;
     public static int AImana = 1;
     public static int blood = 0;
     public static int AIblood = 0;
-    public static ArrayList<String> stateYour = new ArrayList<>(); // permanents you control. A list of keys to cardBase
+    private static ArrayList<String> stateYour = new ArrayList<>(); // permanents you control. A list of keys to cardBase
     public static ArrayList<String> stateAI = new ArrayList<>(); // permanents the AI controls,
     public static Deck pl2 = new Deck();
 
